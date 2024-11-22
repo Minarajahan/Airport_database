@@ -1,0 +1,105 @@
+CREATE DATABASE Airport;
+USE Airport;
+
+
+CREATE TABLE Airports (
+    airport_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    iata_code VARCHAR(3) UNIQUE NOT NULL,
+    runways INT NOT NULL,
+    terminals INT NOT NULL
+);
+
+
+CREATE TABLE Terminals (
+    terminal_id INT PRIMARY KEY AUTO_INCREMENT,
+    airport_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (airport_id) REFERENCES Airports(airport_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Gates (
+    gate_id INT PRIMARY KEY AUTO_INCREMENT,
+    terminal_id INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (terminal_id) REFERENCES Terminals(terminal_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Airlines (
+    airline_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    country VARCHAR(100) NOT NULL,
+    iata_code VARCHAR(3) UNIQUE NOT NULL
+);
+
+
+CREATE TABLE Flights (
+    flight_id INT PRIMARY KEY AUTO_INCREMENT,
+    gate_id INT NOT NULL,
+    airline_id INT NOT NULL, -- Replaced airline_name with a foreign key
+    origin VARCHAR(100) NOT NULL,
+    destination VARCHAR(100) NOT NULL,
+    departure_time DATETIME NOT NULL,
+    arrival_time DATETIME NOT NULL,
+    flight_status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (gate_id) REFERENCES Gates(gate_id),
+    FOREIGN KEY (airline_id) REFERENCES Airlines(airline_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Passengers (
+    passenger_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    date_of_birth DATE NOT NULL,
+    passport_number VARCHAR(50) UNIQUE NOT NULL,
+    nationality VARCHAR(50) NOT NULL,
+    contact_number VARCHAR(20) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL
+);
+
+
+CREATE TABLE Tickets (
+    ticket_id INT PRIMARY KEY AUTO_INCREMENT,
+    flight_id INT NOT NULL,
+    passenger_id INT NOT NULL,
+    seat_number VARCHAR(10) NOT NULL,
+    class VARCHAR(20) NOT NULL,
+    booking_date DATETIME NOT NULL,
+    FOREIGN KEY (flight_id) REFERENCES Flights(flight_id) ON DELETE CASCADE,
+    FOREIGN KEY (passenger_id) REFERENCES Passengers(passenger_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Baggage (
+    baggage_id INT PRIMARY KEY AUTO_INCREMENT,
+    ticket_id INT NOT NULL,
+    weight DECIMAL(10,2) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (ticket_id) REFERENCES Tickets(ticket_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Employees (
+    employee_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    position VARCHAR(50) NOT NULL,
+    hire_date DATE NOT NULL,
+    department VARCHAR(50) NOT NULL,
+    contact_number VARCHAR(20) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE Maintenance (
+    maintenance_id INT PRIMARY KEY AUTO_INCREMENT,
+    flight_id INT NOT NULL,
+    employee_id INT NOT NULL,
+    description TEXT NOT NULL,
+    maintenance_date DATETIME NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (flight_id) REFERENCES Flights(flight_id) ON DELETE CASCADE,
+    FOREIGN KEY (employee_id) REFERENCES Employees(employee_id) ON DELETE CASCADE
+);
